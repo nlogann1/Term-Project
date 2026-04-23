@@ -1,29 +1,59 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Message Board Login</title>
-  </head>
-  <body>
-    <h1>Message Board</h1>
-    <% if (error) { %>
-      <p style="color:red;"><%= error %></p>
-    <% } %>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in - Lion Forums</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="x-auth-page">
+    <div class="x-auth-box">
 
-    <h2>Register</h2>
-    <form method="post" action="/register">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <label>Username: <input name="username" required /></label>
-      <label>Password: <input name="password" type="password" required /></label>
-      <button type="submit">Register</button>
-    </form>
+      <div class="x-auth-logo">
+        <div class="x-brand">
+          <span class="x-brand-emoji">🦁</span>
+          <span>Lion Forums</span>
+        </div>
+      </div>
 
-    <h2>Login</h2>
-    <form method="post" action="/login">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <label>Username: <input name="username" required /></label>
-      <label>Password: <input name="password" type="password" required /></label>
-      <button type="submit">Login</button>
-    </form>
-  </body>
+      <% if (error) { %>
+        <div class="x-auth-error"><%= error %></div>
+      <% } %>
+
+      <div class="x-auth-card">
+        <h2>Create your account</h2>
+        <form method="post" action="/register">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="x-field">
+            <label>Username</label>
+            <input name="username" placeholder="Choose a username" required autocomplete="username" />
+          </div>
+          <div class="x-field">
+            <label>Password</label>
+            <input name="password" type="password" placeholder="Create a password" required autocomplete="new-password" />
+          </div>
+          <button type="submit" class="x-auth-submit">Create account</button>
+        </form>
+      </div>
+
+      <div class="x-auth-card">
+        <h2>Sign in</h2>
+        <form method="post" action="/login">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="x-field">
+            <label>Username</label>
+            <input name="username" placeholder="Username" required autocomplete="username" />
+          </div>
+          <div class="x-field">
+            <label>Password</label>
+            <input name="password" type="password" placeholder="Password" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="x-auth-submit" style="background:var(--blue);color:#fff;">Sign in</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</body>
 </html>

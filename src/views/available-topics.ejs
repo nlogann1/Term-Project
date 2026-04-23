@@ -1,27 +1,78 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Available Topics</title>
-  </head>
-  <body>
-    <h1>Topics Available for Subscription</h1>
-    <p><a href="/dashboard">Back to dashboard</a></p>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Topics - Lion Forums</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="x-layout">
 
-    <% if (topics.length === 0) { %>
-      <p>No available topics.</p>
-    <% } %>
+    <!-- Left Sidebar -->
+    <nav class="x-sidebar">
+      <div class="x-logo">
+        <div class="x-brand">
+          <span class="x-brand-emoji">🦁</span>
+          <span>Lion Forums</span>
+        </div>
+      </div>
+      <div class="x-nav">
+        <a href="/dashboard" class="x-nav-item">
+          <svg viewBox="0 0 24 24"><path d="M12 1.696L.622 8.807l1.04 1.696L3 9.86V19.5C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5V9.86l1.338.643 1.04-1.696L12 1.696z"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="/topics/available" class="x-nav-item active">
+          <svg viewBox="0 0 24 24"><path d="M10.09 3.098L9.72 7h5.99l.39-4.089 1.99.187L17.72 7h3.78v2h-3.97l-.56 6h3.53v2h-3.72l-.38 4.089-1.99-.187.36-3.902H8.78l-.38 4.089-1.99-.187L6.77 17H3v-2h3.96l.56-6H4v-2h3.71l.38-4.089 1.99.187zM14.96 15l.56-6H9.53l-.56 6h5.99z"/></svg>
+          <span>Topics</span>
+        </a>
+        <a href="/topics/stats" class="x-nav-item">
+          <svg viewBox="0 0 24 24"><path d="M3 20v-8l4-4 4 4 5-7 5 4v11H3zm2-2h14v-8.3l-3.6-2.88-4.82 6.74-4.08-4.08L5 13.08V18z"/></svg>
+          <span>Stats</span>
+        </a>
+      </div>
+    </nav>
 
-    <ul>
-      <% topics.forEach((topic) => { %>
-        <li>
-          <%= topic.name %>
-          <form method="post" action="/topics/<%= topic._id %>/subscribe" style="display:inline;">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button type="submit">Subscribe</button>
-          </form>
-        </li>
-      <% }); %>
-    </ul>
-  </body>
+    <!-- Main -->
+    <main class="x-main">
+      <div class="x-header">
+        <a href="/dashboard" class="x-back-link" style="margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--text-primary);"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"/></svg>
+        </a>
+        <h1>Topics</h1>
+        <div class="x-header-sub">Subscribe to topics to follow</div>
+      </div>
+
+      <div class="x-topics-list">
+        <% if (topics.length === 0) { %>
+          <div class="x-empty">No topics available right now.</div>
+        <% } %>
+
+        <% topics.forEach((topic) => { %>
+          <div class="x-topic-row">
+            <div class="x-topic-row-info">
+              <div class="x-topic-row-name">#<%= topic.name %></div>
+              <div class="x-topic-row-meta">Topic</div>
+            </div>
+            <form method="post" action="/topics/<%= topic._id %>/subscribe">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button type="submit" class="x-subscribe-btn">Follow</button>
+            </form>
+          </div>
+        <% }); %>
+      </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="x-right">
+      <div class="x-widget">
+        <h2>About Lion Forums</h2>
+        <p style="color:var(--text-secondary);font-size:14px;line-height:1.5;margin-bottom:10px;">Topic search is not enabled yet in this app.</p>
+        <h2 style="font-size:18px;margin-bottom:8px;">What are topics?</h2>
+        <p style="color:var(--text-secondary);font-size:14px;line-height:1.5;">Topics are channels you can follow. Once you follow a topic, posts from that channel will appear in your home feed.</p>
+      </div>
+    </aside>
+
+  </div>
+</body>
 </html>

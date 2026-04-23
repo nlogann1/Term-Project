@@ -1,60 +1,152 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard</title>
-  </head>
-  <body>
-    <h1>Welcome, <%= username %></h1>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - Lion Forums</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="x-layout">
 
-    <p>
-      <a href="/topics/available">Show topics available for subscription</a> |
-      <a href="/topics/stats">Topic access statistics</a>
-    </p>
+    <!-- Left Sidebar -->
+    <nav class="x-sidebar">
+      <div class="x-logo">
+        <div class="x-brand">
+          <span class="x-brand-emoji">🦁</span>
+          <span>Lion Forums</span>
+        </div>
+      </div>
+      <div class="x-nav">
+        <a href="/dashboard" class="x-nav-item active">
+          <svg viewBox="0 0 24 24"><path d="M12 1.696L.622 8.807l1.04 1.696L3 9.86V19.5C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5V9.86l1.338.643 1.04-1.696L12 1.696zM12 16.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="/topics/available" class="x-nav-item">
+          <svg viewBox="0 0 24 24"><path d="M10.09 3.098L9.72 7h5.99l.39-4.089 1.99.187L17.72 7h3.78v2h-3.97l-.56 6h3.53v2h-3.72l-.38 4.089-1.99-.187.36-3.902H8.78l-.38 4.089-1.99-.187L6.77 17H3v-2h3.96l.56-6H4v-2h3.71l.38-4.089 1.99.187zM14.96 15l.56-6H9.53l-.56 6h5.99z"/></svg>
+          <span>Topics</span>
+        </a>
+        <a href="/topics/stats" class="x-nav-item">
+          <svg viewBox="0 0 24 24"><path d="M3 20v-8l4-4 4 4 5-7 5 4v11H3zm2-2h14v-8.3l-3.6-2.88-4.82 6.74-4.08-4.08L5 13.08V18z"/></svg>
+          <span>Stats</span>
+        </a>
+      </div>
 
-    <form method="post" action="/logout">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <button type="submit">Logout</button>
-    </form>
+      <form method="post" action="/logout">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <button type="submit" class="x-nav-item" style="color:var(--red);font-size:20px;font-weight:400;">
+          <svg viewBox="0 0 24 24" style="fill:var(--red)"><path d="M15.5 8.25a.75.75 0 0 0-.75-.75H8.5V3a.75.75 0 0 0-1.28-.53l-5 5a.75.75 0 0 0 0 1.06l5 5A.75.75 0 0 0 8.5 13v-4.5h6.25a.75.75 0 0 0 .75-.75zm3.25-6h-9a.75.75 0 1 0 0 1.5h9a.25.25 0 0 1 .25.25v16a.25.25 0 0 1-.25.25h-9a.75.75 0 1 0 0 1.5h9c.966 0 1.75-.784 1.75-1.75V4c0-.966-.784-1.75-1.75-1.75z"/></svg>
+          <span>Log out</span>
+        </button>
+      </form>
 
-    <h2>Create Topic</h2>
-    <form method="post" action="/topics">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-      <label>Topic Name: <input name="name" required /></label>
-      <button type="submit">Create Topic</button>
-    </form>
+      <div class="x-sidebar-user">
+        <div class="x-sidebar-user-avatar"><%= username.charAt(0).toUpperCase() %></div>
+        <div class="x-sidebar-user-info">
+          <div class="x-sidebar-user-name"><%= username %></div>
+          <div class="x-sidebar-user-handle">@<%= username.toLowerCase() %></div>
+        </div>
+      </div>
+    </nav>
 
-    <h2>Subscribed Topics</h2>
-    <% if (messageGroups.length === 0) { %>
-      <p>No subscriptions yet.</p>
-    <% } %>
+    <!-- Main Feed -->
+    <main class="x-main">
+      <div class="x-header">
+        <h1>Home</h1>
+        <div class="x-header-sub">Your subscribed topics</div>
+      </div>
 
-    <% messageGroups.forEach(({ topic, messages }) => { %>
-      <section style="border:1px solid #ddd; margin:8px 0; padding:8px;">
-        <h3><%= topic.name %></h3>
+      <!-- Create Topic -->
+      <form method="post" action="/topics" class="x-create-topic">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input name="name" placeholder="Create a new topic..." required />
+        <button type="submit" class="x-post-btn">Create</button>
+      </form>
 
-        <form method="post" action="/topics/<%= topic._id %>/unsubscribe" style="display:inline;">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <button type="submit">Unsubscribe</button>
-        </form>
+      <!-- Feed -->
+      <% if (messageGroups.length === 0) { %>
+        <div class="x-empty">
+          <p style="font-size:20px;font-weight:700;margin-bottom:8px;">Welcome to Lion Forums!</p>
+          <p>Subscribe to topics to see posts here.</p>
+          <a href="/topics/available" style="display:inline-block;margin-top:16px;background:var(--blue);color:#fff;border-radius:9999px;padding:10px 24px;font-weight:700;text-decoration:none;">Browse Topics</a>
+        </div>
+      <% } %>
 
-        <h4>2 Most Recent Messages</h4>
-        <% if (messages.length === 0) { %>
-          <p>No messages yet.</p>
-        <% } %>
+      <% messageGroups.forEach(({ topic, messages }) => { %>
+        <div class="x-topic-section">
+          <div class="x-topic-header">
+            <div>
+              <span class="x-topic-tag">#</span>
+              <span class="x-topic-name"><%= topic.name %></span>
+            </div>
+            <form method="post" action="/topics/<%= topic._id %>/unsubscribe">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button type="submit" class="x-unsubscribe-btn">Unfollow</button>
+            </form>
+          </div>
 
-        <ul>
+          <% if (messages.length === 0) { %>
+            <div class="x-empty">No posts yet. Be the first!</div>
+          <% } %>
+
           <% messages.forEach((message) => { %>
-            <li><strong><%= message.author.username %>:</strong> <%= message.content %></li>
+            <div class="x-post">
+              <div class="x-post-avatar"><%= message.author.username.charAt(0).toUpperCase() %></div>
+              <div class="x-post-body">
+                <div class="x-post-header">
+                  <span class="x-post-author"><%= message.author.username %></span>
+                  <span class="x-post-handle">@<%= message.author.username.toLowerCase() %></span>
+                </div>
+                <div class="x-post-content"><%= message.content %></div>
+                <div class="x-post-actions">
+                  <span class="x-post-action">
+                    <svg viewBox="0 0 24 24"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 7.498 3.858 6.629 8.138-.393 1.964-1.98 3.987-4.037 4.819l-8.962 3.738c-.51.213-1.082-.174-1.082-.737v-3.37c-3.045-.57-4.919-3.08-4.919-4.588zM9.756 4c-3.305 0-6.005 2.686-6.005 6 0 1.22 1.52 3.093 3.919 3.381v3.488l7.995-3.331c1.487-.62 2.668-2.055 2.952-3.47C19.05 7.159 17.087 4 14.122 4H9.756z"/></svg>
+                    Reply
+                  </span>
+                  <span class="x-post-action">
+                    <svg viewBox="0 0 24 24"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"/></svg>
+                    Like
+                  </span>
+                </div>
+              </div>
+            </div>
           <% }); %>
-        </ul>
 
-        <form method="post" action="/topics/<%= topic._id %>/messages">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-          <label>Post Message: <input name="content" required /></label>
-          <button type="submit">Post</button>
-        </form>
-      </section>
-    <% }); %>
-  </body>
+          <!-- Post compose for this topic -->
+          <div class="x-compose">
+            <div class="x-compose-avatar"><%= username.charAt(0).toUpperCase() %></div>
+            <form method="post" action="/topics/<%= topic._id %>/messages" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <textarea class="x-compose-input" name="content" placeholder="Post a reply..." rows="2" required></textarea>
+              <div style="display:flex;justify-content:flex-end;">
+                <button type="submit" class="x-post-btn">Post</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      <% }); %>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="x-right">
+      <div class="x-widget">
+        <h2>Lion Forums</h2>
+        <p style="color:var(--text-secondary);font-size:14px;line-height:1.5;margin-bottom:12px;">Topic search is not enabled yet, so only functional actions are shown.</p>
+
+        <h2 style="font-size:18px;margin-bottom:8px;">Your Topics</h2>
+        <% if (messageGroups.length === 0) { %>
+          <div style="color:var(--text-secondary);font-size:14px;">No subscriptions yet.</div>
+        <% } %>
+        <% messageGroups.forEach(({ topic }) => { %>
+          <div class="x-widget-item">
+            <div class="x-widget-item-value">#<%= topic.name %></div>
+            <div class="x-widget-item-label">Topic</div>
+          </div>
+        <% }); %>
+        <a href="/topics/available" style="display:block;margin-top:12px;color:var(--blue);font-size:14px;">Browse more topics</a>
+      </div>
+    </aside>
+
+  </div>
+</body>
 </html>

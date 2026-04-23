@@ -5,7 +5,6 @@ const connectMongo = require('connect-mongo');
 const rateLimit = require('express-rate-limit');
 const routes = require('./routes');
 const { csrfProtection, attachCsrfToken } = require('./middleware/csrf');
-
 const app = express();
 
 app.set('trust proxy', 1);
@@ -13,6 +12,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static('src'));
 
 const MongoStore =
   connectMongo?.default ||
