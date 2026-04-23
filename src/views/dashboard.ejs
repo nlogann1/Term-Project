@@ -13,11 +13,13 @@
     </p>
 
     <form method="post" action="/logout">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <button type="submit">Logout</button>
     </form>
 
     <h2>Create Topic</h2>
     <form method="post" action="/topics">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <label>Topic Name: <input name="name" required /></label>
       <button type="submit">Create Topic</button>
     </form>
@@ -32,6 +34,7 @@
         <h3><%= topic.name %></h3>
 
         <form method="post" action="/topics/<%= topic._id %>/unsubscribe" style="display:inline;">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button type="submit">Unsubscribe</button>
         </form>
 
@@ -47,6 +50,7 @@
         </ul>
 
         <form method="post" action="/topics/<%= topic._id %>/messages">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <label>Post Message: <input name="content" required /></label>
           <button type="submit">Post</button>
         </form>

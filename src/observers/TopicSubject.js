@@ -28,9 +28,9 @@ class TopicSubject {
       return;
     }
 
-    for (const observer of topicObservers.values()) {
-      await observer.update(topic, message);
-    }
+    await Promise.allSettled(
+      [...topicObservers.values()].map((observer) => observer.update(topic, message)),
+    );
   }
 }
 

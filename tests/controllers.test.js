@@ -101,6 +101,40 @@ describe('topicController', () => {
     expect(topicSubject.notify).toHaveBeenCalledWith({ _id: 'topic-1' }, { _id: 'msg-1' });
     expect(res.redirect).toHaveBeenCalledWith('/dashboard');
   });
+
+  test('createTopic returns duplicate-topic message when topic name already exists', async () => {
+    Topic.create.mockRejectedValue({ code: 11000 });
+
+    const req = { body: { name: 'General' }, session: { userId: 'user-1' } };
+    const res = createMockRes();
+
+    await topicController.createTopic(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith('Topic already exists.');
+  });
+
+  test('subscribe returns 404 when topic does not exist', async () => {
+    Topic.findById.mockResolvedValue(null);
+    const req = { params: { topicId: 'missing-topic' }, session: { userId: 'user-1' } };
+    const res = createMockRes();
+
+    await topicController.subscribe(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith('Topic not found.');
+  });
+
+  test('unsubscribe returns 400 when user is not subscribed', async () => {
+    User.findById.mockResolvedValue({ subscriptions: [] });
+    const req = { params: { topicId: 'topic-1' }, session: { userId: 'user-1' } };
+    const res = createMockRes();
+
+    await topicController.unsubscribe(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith('User is not subscribed to this topic.');
+  });
 });
 
 describe('authController', () => {
@@ -118,12 +152,11 @@ describe('authController', () => {
 
     Message.find.mockReturnValue({
       sort: jest.fn().mockReturnValue({
-        limit: jest.fn().mockReturnValue({
-          populate: jest.fn().mockResolvedValue([
-            { content: 'newest', author: { username: 'a' } },
-            { content: 'older', author: { username: 'b' } },
-          ]),
-        }),
+        populate: jest.fn().mockResolvedValue([
+          { topic: 'topic-1', content: 'newest', author: { username: 'a' } },
+          { topic: 'topic-1', content: 'older', author: { username: 'b' } },
+          { topic: 'topic-1', content: 'oldest', author: { username: 'c' } },
+        ]),
       }),
     });
 
@@ -144,11 +177,28 @@ describe('authController', () => {
         {
           topic: subscription,
           messages: [
-            { content: 'newest', author: { username: 'a' } },
-            { content: 'older', author: { username: 'b' } },
+            { topic: 'topic-1', content: 'newest', author: { username: 'a' } },
+            { topic: 'topic-1', content: 'older', author: { username: 'b' } },
           ],
         },
       ],
+    });
+  });
+
+  test('dashboard handles users with no subscriptions', async () => {
+    User.findById.mockReturnValue({
+      populate: jest.fn().mockResolvedValue({ username: 'alice', subscriptions: [] }),
+    });
+
+    const req = { session: { userId: 'user-1' } };
+    const res = createMockRes();
+
+    await authController.dashboard(req, res);
+
+    expect(Topic.updateMany).not.toHaveBeenCalled();
+    expect(res.render).toHaveBeenCalledWith('dashboard', {
+      username: 'alice',
+      messageGroups: [],
     });
   });
 });

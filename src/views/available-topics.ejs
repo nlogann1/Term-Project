@@ -17,6 +17,7 @@
         <li>
           <%= topic.name %>
           <form method="post" action="/topics/<%= topic._id %>/subscribe" style="display:inline;">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <button type="submit">Subscribe</button>
           </form>
         </li>

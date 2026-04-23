@@ -1,7 +1,9 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const rateLimit = require('express-rate-limit');
 const routes = require('./routes');
+const { csrfProtection, attachCsrfToken } = require('./middleware/csrf');
 
 const app = express();
 
@@ -17,8 +19,18 @@ app.use(session({
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60,
   },
 }));
+
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
+app.use(attachCsrfToken);
+app.use(csrfProtection);
 
 app.use(routes);
 

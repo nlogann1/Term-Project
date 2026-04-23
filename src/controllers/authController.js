@@ -74,20 +74,30 @@ async function dashboard(req, res) {
   }
 
   const subscribedTopicIds = user.subscriptions.map((topic) => topic._id);
+  const messagesByTopic = new Map();
 
-  const messageGroups = await Promise.all(
-    user.subscriptions.map(async (topic) => {
-      const messages = await Message.find({ topic: topic._id })
-        .sort({ createdAt: -1 })
-        .limit(2)
-        .populate('author');
+  if (subscribedTopicIds.length > 0) {
+    const allMessages = await Message.find({ topic: { $in: subscribedTopicIds } })
+      .sort({ createdAt: -1 })
+      .populate('author');
 
-      return {
-        topic,
-        messages,
-      };
-    }),
-  );
+    for (const message of allMessages) {
+      const key = message.topic.toString();
+      if (!messagesByTopic.has(key)) {
+        messagesByTopic.set(key, []);
+      }
+
+      const topicMessages = messagesByTopic.get(key);
+      if (topicMessages.length < 2) {
+        topicMessages.push(message);
+      }
+    }
+  }
+
+  const messageGroups = user.subscriptions.map((topic) => ({
+    topic,
+    messages: messagesByTopic.get(topic._id.toString()) || [],
+  }));
 
   if (subscribedTopicIds.length > 0) {
     await Topic.updateMany(

@@ -43,6 +43,10 @@ async function showAvailableTopics(req, res) {
 
 async function subscribe(req, res) {
   const topicId = req.params.topicId;
+  const topic = await Topic.findById(topicId);
+  if (!topic) {
+    return res.status(404).send('Topic not found.');
+  }
 
   await User.findByIdAndUpdate(
     req.session.userId,
@@ -61,6 +65,10 @@ async function subscribe(req, res) {
 
 async function unsubscribe(req, res) {
   const topicId = req.params.topicId;
+  const user = await User.findById(req.session.userId);
+  if (!user || !user.subscriptions.some((id) => id.toString() === topicId)) {
+    return res.status(400).send('User is not subscribed to this topic.');
+  }
 
   await User.findByIdAndUpdate(
     req.session.userId,
