@@ -14,13 +14,26 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: false }));
 
-const MongoStore = (typeof connectMongo.create === 'function')
-  ? connectMongo
-  : connectMongo(session);
+const MongoStore =
+  connectMongo?.default ||
+  connectMongo?.MongoStore ||
+  connectMongo;
 
-const sessionStore = (typeof MongoStore.create === 'function')
-  ? MongoStore.create({ mongoUrl: process.env.MONGO_URI }) // v4+
-  : new MongoStore({ url: process.env.MONGO_URI });        // v3
+let sessionStore;
+
+if (MongoStore && typeof MongoStore.create === 'function') {
+  // v4+/newer style
+  sessionStore = MongoStore.create({ mongoUrl: process.env.MONGO_URI });
+} else if (typeof MongoStore === 'function') {
+  // legacy constructor styles
+  try {
+    sessionStore = new MongoStore({ mongoUrl: process.env.MONGO_URI });
+  } catch {
+    sessionStore = new MongoStore({ url: process.env.MONGO_URI });
+  }
+} else {
+  throw new Error('Unsupported connect-mongo version/export');
+}
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'term-project-secret',
