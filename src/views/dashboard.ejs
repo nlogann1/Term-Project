@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+  </head>
+  <body>
+    <h1>Welcome, <%= username %></h1>
+
+    <p>
+      <a href="/topics/available">Show topics available for subscription</a> |
+      <a href="/topics/stats">Topic access statistics</a>
+    </p>
+
+    <form method="post" action="/logout">
+      <button type="submit">Logout</button>
+    </form>
+
+    <h2>Create Topic</h2>
+    <form method="post" action="/topics">
+      <label>Topic Name: <input name="name" required /></label>
+      <button type="submit">Create Topic</button>
+    </form>
+
+    <h2>Subscribed Topics</h2>
+    <% if (messageGroups.length === 0) { %>
+      <p>No subscriptions yet.</p>
+    <% } %>
+
+    <% messageGroups.forEach(({ topic, messages }) => { %>
+      <section style="border:1px solid #ddd; margin:8px 0; padding:8px;">
+        <h3><%= topic.name %></h3>
+
+        <form method="post" action="/topics/<%= topic._id %>/unsubscribe" style="display:inline;">
+          <button type="submit">Unsubscribe</button>
+        </form>
+
+        <h4>2 Most Recent Messages</h4>
+        <% if (messages.length === 0) { %>
+          <p>No messages yet.</p>
+        <% } %>
+
+        <ul>
+          <% messages.forEach((message) => { %>
+            <li><strong><%= message.author.username %>:</strong> <%= message.content %></li>
+          <% }); %>
+        </ul>
+
+        <form method="post" action="/topics/<%= topic._id %>/messages">
+          <label>Post Message: <input name="content" required /></label>
+          <button type="submit">Post</button>
+        </form>
+      </section>
+    <% }); %>
+  </body>
+</html>

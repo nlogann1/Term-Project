@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Available Topics</title>
+  </head>
+  <body>
+    <h1>Topics Available for Subscription</h1>
+    <p><a href="/dashboard">Back to dashboard</a></p>
+
+    <% if (topics.length === 0) { %>
+      <p>No available topics.</p>
+    <% } %>
+
+    <ul>
+      <% topics.forEach((topic) => { %>
+        <li>
+          <%= topic.name %>
+          <form method="post" action="/topics/<%= topic._id %>/subscribe" style="display:inline;">
+            <button type="submit">Subscribe</button>
+          </form>
+        </li>
+      <% }); %>
+    </ul>
+  </body>
+</html>

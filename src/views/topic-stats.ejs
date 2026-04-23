@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Topic Statistics</title>
+  </head>
+  <body>
+    <h1>Topic Access Statistics</h1>
+    <p><a href="/dashboard">Back to dashboard</a></p>
+
+    <ul>
+      <% topics.forEach((topic) => { %>
+        <li><%= topic.name %> - accessed <%= topic.accessCount %> time(s)</li>
+      <% }); %>
+    </ul>
+  </body>
+</html>
