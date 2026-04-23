@@ -1,26 +1,33 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const connectMongo = require('connect-mongo');
 const rateLimit = require('express-rate-limit');
 const routes = require('./routes');
 const { csrfProtection, attachCsrfToken } = require('./middleware/csrf');
 
 const app = express();
 
-app.set('trust proxy', 1); 
+app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: false }));
 
+const MongoStore = (typeof connectMongo.create === 'function')
+  ? connectMongo
+  : connectMongo(session);
+
+const sessionStore = (typeof MongoStore.create === 'function')
+  ? MongoStore.create({ mongoUrl: process.env.MONGO_URI }) // v4+
+  : new MongoStore({ url: process.env.MONGO_URI });        // v3
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'term-project-secret',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-  }),
+  proxy: true,
+  store: sessionStore,
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
@@ -36,8 +43,8 @@ app.use(rateLimit({
   legacyHeaders: false,
 }));
 
-app.use(csrfProtection);   // must run first
-app.use(attachCsrfToken);  // then attach token to views
+app.use(csrfProtection);
+app.use(attachCsrfToken);
 
 app.use(routes);
 
