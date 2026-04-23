@@ -25,7 +25,7 @@ const sessionStore = (typeof MongoStore.create === 'function')
 app.use(session({
   secret: process.env.SESSION_SECRET || 'term-project-secret',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   proxy: true,
   store: sessionStore,
   cookie: {
